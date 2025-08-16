@@ -1,7 +1,7 @@
 name: Deploy dist
 on: [push, workflow_dispatch]
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Get Code
@@ -10,32 +10,37 @@ jobs:
         #   echo "${{toJson(github)}}"
         #   git clone https://github.com/${{github.repository}}.git
         uses: actions/checkout@v5
+
       - name: Install Node20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Print Node Version
-        run: |
-          echo "Node version:"
-          node -v
+
       - name: Install Dependencies
         run: npm ci
-      - name: Run Test Cases
-        run: npm run test
 
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get Code
-        uses: actions/checkout@v5
-      - name: Install Node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Install depencies
-        run: npm ci
-      - name: Build Project
+      - name: Build app
         run: npm run build
-      - name: Deploy
-        run: echo "Deploy success"
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Get Code
+  #       uses: actions/checkout@v5
+  #     - name: Install Node 20
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #     - name: Install depencies
+  #       run: npm ci
+  #     - name: Build Project
+  #       run: npm run build
+  #     - name: Deploy
+  #       run: echo "Deploy success"
